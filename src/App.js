@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
 
 function App() {
-  const [num, setNum] = useState(0);
+const [name, setName] = useState("lee");
+const [age, setAge] = useState("20");
+const [address, setAddress] = useState("대전 둔산동");
 
-  const timeout = setTimeout(() => setNum(num + 1), 1000);
 
-  const pause = () => clearTimeout(timeout);
-
-  const resume = () => {
-    setTimeout(() => setNum(num + 1), 1000);
-  }
-
-  return (
-    <>
-    숫자 : {num}
-    <br/>
-    <button onClick={pause}>일시정지</button>
-    <br/>    
-    <button onClick={resume}>재게</button>
-    </>
-  );
+return <>
+<input type="text" placeholder="이름을 입력해주세요" Value={name} onChange={(e) => {
+console.log(e.target.Value);
+}}/>
+<br/>
+<input type="number" placeholder="나이를 입력해주세요" Value={age} onChange={(e) => {
+  setAge(e.target.Value);
+}}/>
+<br/>
+<input type="text" placeholder="주소를 입력해주세요" Value={address} onChange={(e) => {
+  setAddress(e.target.Value);
+}}/>
+</>
 }
 
 export default App;

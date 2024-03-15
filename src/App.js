@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 
-function App() {
-const [name, setName] = useState("lee");
-const [age, setAge] = useState("20");
-const [address, setAddress] = useState("대전 둔산동");
+export default function App(){
+
+const border = '10px solid red';
+const [popupVisible, setPopupVisible] = useState(true);
 
 
 return <>
-<input type="text" placeholder="이름을 입력해주세요" Value={name} onChange={(e) => {
-console.log(e.target.Value);
-}}/>
-<br/>
-<input type="number" placeholder="나이를 입력해주세요" Value={age} onChange={(e) => {
-  setAge(e.target.Value);
-}}/>
-<br/>
-<input type="text" placeholder="주소를 입력해주세요" Value={address} onChange={(e) => {
-  setAddress(e.target.Value);
-}}/>
+  <button className='btn' onClick={() => setPopupVisible(!popupVisible)}>팝업{popupVisible ? "닫기" : "열기"}</button>
+  
+  <div className='my-5 border'></div>
+  {popupVisible && <div style={{width:100, height:100, border}}></div>}
+  
+
 </>
 }
 
-export default App;

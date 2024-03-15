@@ -1,0 +1,6 @@
+{
+    "workbench.editor.languageDetection": true,
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact"
+    }
+}

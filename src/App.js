@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
+import ProductListItem from './productListltem';
 
 export default function App(){
 
-const border = '10px solid red';
-const [popupVisible, setPopupVisible] = useState(true);
 
 
 return <>
-  <button className='btn' onClick={() => setPopupVisible(!popupVisible)}>팝업{popupVisible ? "닫기" : "열기"}</button>
-  
-  <div className='my-5 border'></div>
-  {popupVisible && <div style={{width:100, height:100, border}}></div>}
-  
-
+  <div className='flex gap-3'>
+    <ProductListItem imgNo={1} name="MAC" price="4,300,000"/>
+    <ProductListItem imgNo={2} name="MAC AIR" price="2,300,000"/>
+    <ProductListItem imgNo={3} name="MAC PRO" price="3,300,000"/>
+  </div>
 </>
 }
 

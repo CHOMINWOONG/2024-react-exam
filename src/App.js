@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 export default function App(){
-
   const [recordedNos, setRecordedNos] = useState([10, 20, 30]);
 
   const saveNo = (form) => {
     form.no.value = form.no.value.trim();
-
-    if (form.no.value.length) {
-      alert("숫자를 입력해주세요.");
+    
+    if ( form.no.value.length == 0 ) {
+      alert('숫자를 입력해주세요.');
+      form.no.focus();
       return;
     }
 
@@ -25,14 +25,12 @@ export default function App(){
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          saveNo();
+          saveNo(e.target);
         }}
       >
         <input
           type="number"
           name="no"
-          value={no}
-          onChange={(e) => setNo(e.target.valueAsNumber)}
         />
         <button type="submit">기록</button>
       </form>

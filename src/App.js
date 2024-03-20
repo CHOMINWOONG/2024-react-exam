@@ -20,18 +20,11 @@ export default function App() {
   };
 
   
-  const removeNo5 = () => {
-    const newRecordedNos = recordedNos.filter((el) => el !=5);
+  const removeNo = (index) => {
+    const newRecordedNos = recordedNos.filter((_, _index) => _index != index);
     setRecordedNos(newRecordedNos);
   }
-  const removeFirst = () => {
-    const newRecordedNos = 
-    setRecordedNos(recordedNos.filter((_, index) => index != 0));
-  }
-  const removeLast = () => {
-    const newRecordedNos = 
-    setRecordedNos(recordedNos.filter((_, index) => index != recordedNos.length - 1));
-  }
+  
 
   return (
     <>
@@ -52,14 +45,17 @@ export default function App() {
 
       <hr />
 
-      <h1>기록된 숫자 v1</h1>
+      <h1>기록된 숫자</h1>
       {recordedNos.join(",")}
 
       <hr />
 
-      <button className="btn btn-primary" onClick={removeNo5}>숫자 5 삭제</button>
-      <button className="btn btn-primary" onClick={removeFirst}>첫 숫자 삭제</button>
-      <button className="btn btn-primary" onClick={removeLast}>마지막 숫자 삭제</button>
+      <button className="btn btn-primary" onClick={() => removeNo(0)}>index 0 삭제</button>
+      <button className="btn btn-primary" onClick={() => removeNo(1)}>index 1 삭제</button>
+      <button className="btn btn-primary" onClick={() => removeNo(2)}>index 2 삭제</button>
+      <button className="btn btn-primary" onClick={() => removeNo(3)}>index 3 삭제</button>
+      
+      
     </>
   );
 }

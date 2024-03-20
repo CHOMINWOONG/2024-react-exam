@@ -50,10 +50,15 @@ export default function App() {
 
       <hr />
 
-      <button className="btn btn-primary" onClick={() => removeNo(0)}>index 0 삭제</button>
-      <button className="btn btn-primary" onClick={() => removeNo(1)}>index 1 삭제</button>
-      <button className="btn btn-primary" onClick={() => removeNo(2)}>index 2 삭제</button>
-      <button className="btn btn-primary" onClick={() => removeNo(3)}>index 3 삭제</button>
+      <ul>
+        {recordedNos.map((el, index) => (
+          <li key={index} className='flex'>
+          <span className='w-7'>{el}</span>
+          <span className='w-7'>{index}</span>
+          <button className='btn btn-primary btn-xs' onClick={() => removeNo(index)}>삭제</button>
+          </li>
+        ))}
+      </ul>
       
       
     </>

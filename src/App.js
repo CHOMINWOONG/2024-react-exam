@@ -1,74 +1,64 @@
 import React, { useState, useRef } from 'react';
+import classnames from 'classnames';
 
-export default function App() {
-  const noInputRef = useRef(null);
-  const [no, setNo] = useState("");
+let NotifyOnce_workDone = false;
 
-  const [recordedNos, setRecordedNos] = useState([
-    5, 10, 5, 15, 25, 25, 30, 20
-  ]);
-  
-  const saveNo = () => {
-    if (no === "") {
-      alert("숫자를 입력해주세요.");
-      return;
-    }
+function NotifyOnce({children}) {
+  const [visivle, setVisible] = useState(false);
 
-    setRecordedNos([...recordedNos, no, ]);
-    setNo("");
-    noInputRef.current.focus();
-  };
+  if ( NotifyOnce_workDone == false ) {
+    setTimeout(function() {
+      setVisible(true);
+    }, 1000);
 
-  
-  const removeNo = (index) => {
-    const newRecordedNos = recordedNos.filter((_, _index) => _index != index);
-    setRecordedNos(newRecordedNos);
-  }
+    setTimeout(function() {
+      setVisible(false);
+    }, 3000);
 
-  const modifyNo = (index, newNo) => {
-    setRecordedNos(
-      recordedNos.map((el, _index) => _index == index ? newNo : el)
-    );
+    NotifyOnce_workDone = true;
   }
   
+  return (
+    <div
+      className={classnames(
+        "fixed transition-all right-[10px]",
+        {
+          "top-[-60px]" : !visivle
+        },
+        {
+          "top-[5px]" : visivle
+        }
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+function Alert({color:color_, children}) {
+  const color = color_ ?? "white";
 
   return (
+    <div role="alert" className="alert alert-info">
+      <div className={`text-[${color}]`}>
+        <i className="fa-solid fa-face-smile"></i>
+        <span>{children}</span>
+      </div>
+    </div>
+  )
+}
+
+export default function App() {
+  return (
     <>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          saveNo();
-        }}
-      >
-        <input
-          type="number"
-          ref={noInputRef}
-          value={no}
-          onChange={(e) => setNo(e.target.valueAsNumber)}
-        />
-        <button type="submit">기록</button>
-      </form>
-
-      <hr />
-
-      <h1>기록된 숫자</h1>
-      {recordedNos.join(",")}
-
-      <hr />
-
-      <ul>
-        {recordedNos.map((el, index) => (
-          <li key={index} className='flex'>
-            <span className='w-7'>{el}</span>
-            <span className='w-7'> : {index}</span>
-            <button className='btn btn-primary btn-xs' onClick={() => removeNo(index)}>삭제</button>
-            <button className='btn btn-primary btn-xs' onClick={() => modifyNo(index, el + 1)}>+1</button>
-            <button className='btn btn-primary btn-xs' onClick={() => modifyNo(index, el - 1)}>-1</button>
-          </li>
-        ))}
-      </ul>
+      <NotifyOnce>
+        <Alert>안녕 반가워ㅎㅎ</Alert>
+      </NotifyOnce>
       
-      
+      <div>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque, in! Eveniet, ad recusandae. Pariatur distinctio tenetur odit repellendus facilis reiciendis, quo, molestiae eius vitae maxime et quaerat dolores in temporibus.
+      </div>
+
     </>
   );
 }

@@ -1,67 +1,64 @@
-import React, { useState, useRef } from 'react';
-import classnames from 'classnames';
+import React, { useState, useRef, useEffect } from 'react';
 
-let NotifyOnce_workDone = false;
+let AppCallCount = 0;
+let SubCallCount = 0;
 
-function NotifyOnce({children}) {
-  const [visivle, setVisible] = useState(false);
+function Sub({appNo}) {
+  SubCallCount++;
+  console.log(`SubCallCount : ${SubCallCount}`);
+  const [no, setNo] = useState(0);
+  const [no2, setNo2] = useState(0);
 
-  if ( NotifyOnce_workDone == false ) {
-    setTimeout(function() {
-      setVisible(true);
-    }, 1000);
+  useEffect(() => {
+    console.log('effect 1 : 한번만 실행');
+  }, []);
 
-    setTimeout(function() {
-      setVisible(false);
-    }, 3000);
+  useEffect(() => {
+    console.log('effect 2 : 부모(App)이 바뀔 때 마다 실행');
+  }, [appNo]);
 
-    NotifyOnce_workDone = true;
-  }
-  
-  return (
-    <div
-      className={classnames(
-        "fixed transition-all right-[10px]",
-        {
-          "top-[-60px]" : !visivle
-        },
-        {
-          "top-[5px]" : visivle
-        }
-      )}
-    >
-      {children}
-    </div>
-  )
-}
+  useEffect(() => {
+    console.log('effect 3 : 나(Sub)의 no가 바뀔 때 마다 실행');
+  }, [no]);
 
-function Alert({color:color_, children}) {
-  const color = color_ ?? "white";
+  useEffect(() => {
+    console.log('effect 4 : appNo, no가 바뀔 때 마다 실행');
+  }, [appNo, no]);
 
-  return (
-    <div role="alert" className="alert alert-info">
-      <div className={`text-[${color}]`}>
-        <i className="fa-solid fa-face-smile"></i>
-        <span>{children}</span>
-      </div>
-    </div>
-  )
-}
+  useEffect(() => {
+    console.log('effect 5 : 매번 실행');
+  },);
 
-export default function App() {
   return (
     <>
-      <NotifyOnce>
-        <Alert>안녕 반가워ㅎㅎ</Alert>
-      </NotifyOnce>
-      
-      <div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque, in! Eveniet, ad recusandae. Pariatur distinctio tenetur odit repellendus facilis reiciendis, quo, molestiae eius vitae maxime et quaerat dolores in temporibus.
+      <div className='p-10 border border-blue-500'>
+        AppNo : {appNo}
+        <hr />
+        <button className='btn' onClick={() => setNo(no + 1)}>sub 증가 : {no}</button>
+        <button className='btn' onClick={() => setNo2(no2 + 1)}>sub2 증가 : {no2}</button>
       </div>
-
     </>
   );
 }
+
+export default function App() {
+  
+  AppCallCount++;
+  console.log(`AppCallCount : ${AppCallCount}`);
+  const [no, setNo] = useState(0);
+  
+
+  return (
+    <>
+      <div className='p-10 border border-red-500'>
+        <button className='btn' onClick={() => setNo(no + 1)}>app 증가 : {no}</button>
+        <hr />
+        <Sub appNo={no}/>
+      </div>
+    </>
+  );
+}
+
 
 
 

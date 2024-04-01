@@ -1,8 +1,38 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
+function TodoApp({todosState}) {
 
-export default function App() {
 
+  const onAddBtnClick = () => {
+    todosState.addTodo('안녕');
+  }
+
+  const onRemoveBtnClick = () => {
+    todosState.removeTodo(1);
+  }
+
+  const onEditBtnClick = () => {
+    todosState.EditTodo(1, '수정됨');
+  }
+
+  return (
+    <>
+      <button className="btn btn-info" onClick={onAddBtnClick}>추가</button>
+      <button className="btn btn-info" onClick={onRemoveBtnClick}>삭제</button>
+      <button className="btn btn-info" onClick={onEditBtnClick}>수정</button>
+      <hr />
+      <ul>
+        {todosState.todos.map((todo, index) => (
+          <li key={index}>
+            {todo.id} {todo.regDate} {todo.content}
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
+function useTodosState() {
   const [todos, setTodos] = useState([]);
 
   const lastTodoIdRef = useRef(0);
@@ -33,34 +63,25 @@ export default function App() {
     setTodos(newTodos);
   };
 
-  
+  return {
+    todos,
+    addTodo,
+    removeTodo,
+    EditTodo
 
-  const onAddBtnClick = () => {
-    addTodo('안녕');
-  }
+  }  
 
-  const onRemoveBtnClick = () => {
-    removeTodo(1);
-  }
 
-  const onEditBtnClick = () => {
-    EditTodo(1, '수정됨');
-  }
 
+}
+
+export default function App() {
+  const todosState = useTodosState();
+ 
   return (
 
     <> 
-      <button className="btn btn-info" onClick={onAddBtnClick}>추가</button>
-      <button className="btn btn-info" onClick={onRemoveBtnClick}>삭제</button>
-      <button className="btn btn-info" onClick={onEditBtnClick}>수정</button>
-      <hr />
-      <ul>
-        {todos.map((todo, index) => (
-          <li key={index}>
-            {todo.id} {todo.regDate} {todo.content}
-          </li>
-        ))}
-      </ul>
+    <TodoApp todosState={todosState}/>
     </>
   )
 }

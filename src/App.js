@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { Button } from "@mui/material";
 
 function TodoApp({todosState}) {
 
@@ -17,9 +18,9 @@ function TodoApp({todosState}) {
 
   return (
     <>
-      <button className="btn btn-info" onClick={onAddBtnClick}>추가</button>
-      <button className="btn btn-info" onClick={onRemoveBtnClick}>삭제</button>
-      <button className="btn btn-info" onClick={onEditBtnClick}>수정</button>
+      <Button variant='contained' className="btn btn-info" onClick={onAddBtnClick}>추가</Button>
+      <Button variant='contained' className="btn btn-info" onClick={onRemoveBtnClick}>삭제</Button>
+      <Button variant='contained' className="btn btn-info" onClick={onEditBtnClick}>수정</Button>
       <hr />
       <ul>
         {todosState.todos.map((todo, index) => (

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, } from 'react';
 import { AppBar, Toolbar, Button, TextField, Chip, SwipeableDrawer, List, ListItem, ListItemButton, Divider, Modal, Snackbar, Alert as MuiAlert } from "@mui/material";
 import classNames from 'classnames';
 import {
@@ -206,7 +206,8 @@ function useEditTodoModalState() {
   };
 }
 
-function EditTodoModal({state, todo, closeDrawer, noticeSnackbarState}) {
+function EditTodoModal({state, todo, closeDrawer}) {
+  const noticeSnackbarState = useNoticeSnackbarState();
   const todosState = useTodosState();
 
   const close = () => {
@@ -260,8 +261,10 @@ function EditTodoModal({state, todo, closeDrawer, noticeSnackbarState}) {
   )
 }
 
-function TodoOptionDrawer({state, noticeSnackbarState}) {
+function TodoOptionDrawer({state}) {
   const todosState = useTodosState();
+  const noticeSnackbarState = useNoticeSnackbarState();
+
   const editTodoModalState = useEditTodoModalState();
   const todo = todosState.findTodoById(state.todoId);
 
@@ -317,7 +320,7 @@ function TodoList({noticeSnackbarState}) {
 
   return (
     <>
-      <TodoOptionDrawer state={todoOptionDrawerState} noticeSnackbarState={noticeSnackbarState} />
+      <TodoOptionDrawer state={todoOptionDrawerState} />
 
 
       <div className='mt-4 px-4'>
@@ -336,8 +339,9 @@ function TodoList({noticeSnackbarState}) {
   )
 }
 
-function NewTodoForm({noticeSnackbarState}) {
+function NewTodoForm() {
   const todosState = useTodosState();
+  const noticeSnackbarState = useNoticeSnackbarState();
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -376,7 +380,8 @@ function NewTodoForm({noticeSnackbarState}) {
   )
 }
 
-function NoticeSnackbar({state}) {
+function NoticeSnackbar() {
+  const state = useNoticeSnackbarState();
   return(
     <>
     <Snackbar
@@ -390,21 +395,35 @@ function NoticeSnackbar({state}) {
   )
 }
 
+const noticeSnackbarAtom = atom({
+  key: "app/noticeSnackbarAtom",
+  default: {
+    opened: false,
+    autoHideDuration: 0,
+    severity: "",
+    msg: ""
+  }
+});
+
 function useNoticeSnackbarState() {
-  const [opened, setOpened] = useState(false);
-  const [autoHideDuration, setAutoHideDuration] = useState(null);
-  const [severity, setSeverity] = useState(null);
-  const [msg, setMsg] = useState(null);
+  const [noticeSnackbar, setNoticeSnackbar] = useRecoilState(noticeSnackbarAtom);
+
+  const opened = noticeSnackbar.opened;
+  const autoHideDuration = noticeSnackbar.autoHideDuration;
+  const severity = noticeSnackbar.severity;
+  const msg = noticeSnackbar.msg;
 
   const open = (msg, severity = "success", autoHideDuration = 6000) => {
-    setOpened(true);
-    setMsg(msg);
-    setSeverity(severity);
-    setAutoHideDuration(autoHideDuration);
+    setNoticeSnackbar({
+    opened: true,
+    autoHideDuration,
+    severity,
+    msg
+    });
   }
 
   const close = () => {
-    setOpened(false);
+    setNoticeSnackbar({...noticeSnackbar, opened: false});
   }
 
   return {
@@ -417,9 +436,7 @@ function useNoticeSnackbarState() {
   }
 }
 export default function App() {
-  const todosState = useTodosState();
-  const noticeSnackbarState = useNoticeSnackbarState();
-
+  
 
 
   
@@ -435,9 +452,9 @@ export default function App() {
       </AppBar>
 
       <Toolbar/>
-      <NoticeSnackbar state={noticeSnackbarState} />
-      <NewTodoForm noticeSnackbarState={noticeSnackbarState} />
-      <TodoList noticeSnackbarState={noticeSnackbarState} />
+      <NoticeSnackbar />
+      <NewTodoForm />
+      <TodoList />
     </>
   );
 }

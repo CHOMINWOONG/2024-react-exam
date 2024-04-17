@@ -9,6 +9,15 @@ import {
   useSetRecoilState,
   useRecoilValue
 } from "recoil";
+import { recoilPersist } from 'recoil-persist';
+
+const { persistAtom: persistAtomTodos } = recoilPersist({
+  key: "persistAtomTodos"
+});
+
+const { persistAtom: persistAtomTodoId } = recoilPersist({
+  key: "persistAtomTodoId"
+});
 
 const Alert = React.forwardRef((props, ref) => {
   return (
@@ -18,12 +27,30 @@ const Alert = React.forwardRef((props, ref) => {
 
 const todosAtom = atom({
   key: "app/todosAtom",
-  default: []
+  default: [
+    {
+      id: 3,
+      regDate: "2020-04-04 01:01:01",
+      content: "코딩"
+    },
+    {
+      id: 2,
+      regDate: "2020-04-04 01:01:01",
+      content: "공부"
+    },
+    {
+      id: 1,
+      regDate: "2020-04-04 01:01:01",
+      content: "운동"
+    }
+  ],
+  effects_UNSTABLE: [persistAtomTodos]
 });
 
 const lastTodoIdAtom = atom({
   key: "app/lastTodoIdAtom",
-  default: 0
+  default: 3,
+  effects_UNSTABLE: [persistAtomTodoId]
 });
 
 function useTodosState() {
@@ -34,6 +61,7 @@ function useTodosState() {
 
   const addTodo = (newContent) => {
     const id = ++lastTodoIdRef.current;
+    setLastTodoId(id);
 
     const newTodo = {
       id,
@@ -392,11 +420,7 @@ export default function App() {
   const todosState = useTodosState();
   const noticeSnackbarState = useNoticeSnackbarState();
 
-  useEffect(() => {
-    todosState.addTodo('운동');
-    todosState.addTodo('코딩');
-    todosState.addTodo('공부');
-  }, []);
+
 
   
 

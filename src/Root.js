@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import {ThemeProvider, CssBaseline, createTheme} from "@mui/material";
 import App from './App';
+import { RecoilRoot } from 'recoil';
 
 const muiThemePaletteKeys = [
   "background",
@@ -49,7 +50,10 @@ export default function Root() {
         return (
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <App />
+            <RecoilRoot>
+              <App />
+            </RecoilRoot>
+            
           </ThemeProvider>
         );
         

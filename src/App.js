@@ -1,483 +1,112 @@
-import React, { useState, useRef, useEffect, useMemo, } from 'react';
-import { AppBar, Toolbar, Button, TextField, Chip, SwipeableDrawer, List, ListItem, ListItemButton, Divider, Modal, Snackbar, Alert as MuiAlert } from "@mui/material";
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import {Routes, Route, Navigate, useLocation, NavLink, useParams, useNavigate} from "react-router-dom"
 import classNames from 'classnames';
-import {
-  RecoilRoot,
-  atom,
-  atomFamily,
-  useRecoilState,
-  useSetRecoilState,
-  useRecoilValue
-} from "recoil";
-import { recoilPersist } from 'recoil-persist';
 
-const { persistAtom: persistAtomTodos } = recoilPersist({
-  key: "persistAtomTodos"
-});
-
-const { persistAtom: persistAtomTodoId } = recoilPersist({
-  key: "persistAtomTodoId"
-});
-
-const Alert = React.forwardRef((props, ref) => {
+function HomeMainPage() {
   return (
-    <MuiAlert {...props} ref={ref} variant='filled'/>
+    <>
+      <h1>HOME, MAIN</h1>
+    </>
   );
-});
+}
 
-const todosAtom = atom({
-  key: "app/todosAtom",
-  default: [
+function ArticleDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <h1>ARTICLE, DETAIL</h1>
+      <h1>{id}번 게시물 상세 페이지</h1>
+      <button onClick={() => navigate(-1)}>뒤로가기</button>
+    </>
+  )
+}
+// 리스트 항목을 만들때 id 값을 부여하여 ARTICLE 클릭시 게시물이 뜸
+function ArticleListPage() {
+  const articles = [
     {
-      id: 3,
-      regDate: "2020-04-04 01:01:01",
-      content: "코딩"
+      id: 1
+    },  
+    {
+      id: 2
     },
-    {
-      id: 2,
-      regDate: "2020-04-04 01:01:01",
-      content: "공부"
-    },
-    {
-      id: 1,
-      regDate: "2020-04-04 01:01:01",
-      content: "운동"
-    }
-  ],
-  effects_UNSTABLE: [persistAtomTodos]
-});
-
-const lastTodoIdAtom = atom({
-  key: "app/lastTodoIdAtom",
-  default: 3,
-  effects_UNSTABLE: [persistAtomTodoId]
-});
-
-function useTodosState() {
-  const [todos, setTodos] = useRecoilState(todosAtom);
-  const [lastTodoId, setLastTodoId] = useRecoilState(lastTodoIdAtom);
-  const lastTodoIdRef = useRef(lastTodoId);
-
-
-  const addTodo = (newContent) => {
-    const id = ++lastTodoIdRef.current;
-    setLastTodoId(id);
-
-    const newTodo = {
-      id,
-      regDate: dateToStr(new Date()),  
-      content: newContent
-    }
-    
-    setTodos((todos) => [newTodo, ...todos]);
-    return id;
-  }
-
-  const removeTodo = (index) => {
-    const newTodos = todos.filter((_, _index) => _index != index);
-    setTodos(newTodos);
-  }
-
-  const modifyTodo = (index, newContent) => {
-    const newTodos = todos.map((todo, _index) =>
-      _index !== index ? todo : { ...todo, content: newContent }
-    );
-    setTodos(newTodos);
-  };
-
-  const modifyTodoById = (id, newContent) => {
-    const index = findTodoIndexById(id);
-
-    if ( index == -1 ) {
-      return;
-    }
-
-    modifyTodo(index, newContent);
-  }
-
-  const removeTodoById = (id) => {
-    const index = todos.findIndex((todo) => todo.id == id);
-
-    if ( index != 1) {
-      removeTodo(index);
-    }
-  }
-
-  const findTodoIndexById = (id) => {
-    return todos.findIndex((todo) => todo.id == id);
-  }
-
-  const findTodoById = (id) => {
-    const index = findTodoIndexById(id);
-
-    if ( index == -1 ) {
-      return null;
-    }
-
-    return todos[index];
-  }
-
-  return {
-    todos,
-    addTodo,
-    removeTodo,
-    modifyTodo,
-    removeTodoById,
-    findTodoById,
-    modifyTodoById
-
-  }  
-
-
-
-}
-
-function TodoListItem({todo, index, openDrawer}) {
-  return (
-    <>
-      <li key={todo.id} className='mt-10'>
-              <div className='flex gap-3'>
-                <Chip label={todo.id} variant="outlined" />
-                <Chip label={todo.regDate} color="primary" variant="outlined" />
-              </div>
-              <div className='flex mt-4 shadow rounded-[20px]'>             
-                  <Button className='flex-shrink-0 !rounded-[10px_0_0_10px]'>
-                    <span 
-                      className={
-                        classNames(
-                          {
-                          "text-[color-var(--mui-color-primary-main)]":
-                          index % 2 == 0
-                          },
-                          { "text-[#dfdfdf]" : index % 2 !== 0}
-                        )}
-                      >
-                        <i className="fa-solid fa-check"></i>
-                    </span>
-                  </Button>
-                  <div className='flex-shrink-0 w-[2px] bg-[#dfdfdf] my-5'></div>
-                  <div className='flex-grow whitespace-pre-wrap leading-relaxed hover:text-[color:var(--mui-color-primary-main)] flex items-center my-5 mx-3'>
-                  {todo.content}
-              </div>
-                <Button 
-                  onClick={() => openDrawer(todo.id)}
-                  className='flex-shrink-0 !rounded-[0_10px_10px_0]'
-                >
-                  <span className='text-[#dfdfdf] text-2xl'>
-                    <i className='fa-solid fa-ellipsis-vertical'></i>
-                  </span>
-                </Button>
-              </div>
-            </li>
-    </>
-  )
-}
-
-function useTodoOptionDrawerState() {
-  const [todoId, setTodoId] = useState(null);
-  const opened = useMemo(() => todoId !== null, [todoId]);
-  const close = () => setTodoId(null);
-  const open = (id) => setTodoId(id);
-
-  return {
-    
-    todoId,
-    opened,
-    close,
-    open
-    
-  }
-}
-
-function useEditTodoModalState() {
-  const [opened, setOpened] = useState(false);
-
-  const open = () => {
-    setOpened(true);
-  }
-
-  const close = () => {
-    setOpened(false);
-  }
-  return {
-    opened,
-    open,
-    close
-  };
-}
-
-function EditTodoModal({state, todo, closeDrawer}) {
-  const noticeSnackbarState = useNoticeSnackbarState();
-  const todosState = useTodosState();
-
-  const close = () => {
-    state.close(); // 모달
-    closeDrawer(); // 드로어
-  }
-  const onSubmit = (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-
-    form.content.value = form.content.value.trim();
-
-    if ( form.content.length == 0 ) {
-      alert('할 일을 입력해주세요');
-      form.content.focus();
-      return;
-    }
-
-    todosState.modifyTodoById(todo.id, form.content.value);
-    close();
-    noticeSnackbarState.open(`${todo.id}번 할 일이 수정되었습니다.`, "info"); 
-    
-  }
+  ];
 
   return (
     <>
-      <Modal
-        open={state.opened}
-        onClose={state.close}
-        className='flex justify-center items-center'
-      >
-        <div className='bg-white rounded-[10px] p-7 w-full max-w-lg'>
-        <form onSubmit={onSubmit} className='flex flex-col gap-2'>
-        <TextField
-          minRows={3}
-          maxRows={10}
-          multiline
-          variant='outlined' 
-          name="content" 
-          autoComplete="off" 
-          label="할 일을 입력해주세요." 
-          defaultValue={todo?.content}
-        />
-
-        <Button type="submit" variant='contained'>수정</Button>
-      </form>
-        </div>
-      </Modal>
+      <h1>ARTICLE, LIST</h1>
+      <ul>
+        {articles.map((article) => (
+          <li key={article.id}>
+            <NavLink to={`/article/detail/${article.id}`}>
+              {article.id}번 게시물
+            </NavLink>
+          </li>
+        ))}
+      </ul>
     </>
-  )
+  );
 }
 
-function TodoOptionDrawer({state}) {
-  const todosState = useTodosState();
-  const noticeSnackbarState = useNoticeSnackbarState();
-
-  const editTodoModalState = useEditTodoModalState();
-  const todo = todosState.findTodoById(state.todoId);
-
-  const removeTodo = () => {
-    if ( window.confirm(`${state.todoId}번 할 일을 삭제하시겠습니까?`) == false ) {
-      return;
-    }
-
-    todosState.removeTodoById(state.todoId);
-    state.close();
-    noticeSnackbarState.open(`${state.todoId}번 할 일이 삭제되었습니다.`, "info");
-  };
-
-  
-  
-
-  return(
-    <>
-    <EditTodoModal state={editTodoModalState} todo={todo} todosState={todosState} closeDrawer={state.close} noticeSnackbarState={noticeSnackbarState}/>
-    <SwipeableDrawer 
-      anchor={"bottom"} 
-      open={state.opened} 
-      onClose={state.close}
-    >
-    <List className='!py-0'>
-      <ListItem className='!p-5'>
-        <span className='text-[color:var(--mui-color-primary-main)] font-bold'>{state.todoId}번</span>
-      </ListItem>
-      <Divider variant='middle'></Divider>
-      <ListItemButton className='!p-5' onClick={editTodoModalState.open}>
-        <i className='fa-regular fa-pen-to-square'></i>
-          <span className='ml-1'>
-            수정
-          </span>
-      </ListItemButton>
-      <ListItemButton className='!p-5' onClick={removeTodo}>
-        <i class="fa-regular fa-trash-can"></i>
-          <span className='ml-1'>
-            삭제
-          </span>  
-      </ListItemButton>
-    </List>
-  </SwipeableDrawer>
-
-  </>
-  )
-}
-
-function TodoList({noticeSnackbarState}) {
-  const todosState = useTodosState();
-  const todoOptionDrawerState = useTodoOptionDrawerState();
-
-
+function UserLoginPage() {
   return (
     <>
-      <TodoOptionDrawer state={todoOptionDrawerState} />
-
-
-      <div className='mt-4 px-4'>
-        <ul>
-          {todosState.todos.map((todo, index) => (
-            <TodoListItem 
-              key={todo.id} 
-              todo={todo} 
-              index={index} 
-              openDrawer={todoOptionDrawerState.open}
-            />
-          ))}
-        </ul>
-      </div>
+      <h1>USER, LOGIN</h1>
     </>
-  )
+  );
 }
 
-function NewTodoForm() {
-  const todosState = useTodosState();
-  const noticeSnackbarState = useNoticeSnackbarState();
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-
-    form.content.value = form.content.value.trim();
-
-    if ( form.content.length == 0 ) {
-      alert('할 일을 입력해주세요');
-      form.content.focus();
-      return;
-
-    }
-
-    const newTodoId = todosState.addTodo(form.content.value);
-    form.content.value= '';
-    form.content.focus();
-    noticeSnackbarState.open(`${newTodoId}번 할 일이 추가되었습니다.`);
-  }
-  return (
-    <>
-      <form onSubmit={onSubmit} className='flex flex-col mt-4 px-4 gap-2'>
-        <TextField
-          minRows={3}
-          maxRows={10}
-          multiline
-          variant='outlined' 
-          name="content" 
-          autoComplete="off" 
-          label="할 일을 입력해주세요." />
-
-        <Button type="submit" variant='contained'>추가</Button>
-      </form>
-    </>
-  )
-}
-
-function NoticeSnackbar() {
-  const state = useNoticeSnackbarState();
-  return(
-    <>
-    <Snackbar
-        open={state.opened}
-        autoHideDuration={state.autoHideDuration}
-        onClose={state.close}
-      >
-        <Alert severity={state.severity}>{state.msg}</Alert>
-      </Snackbar>
-    </>
-  )
-}
-
-const noticeSnackbarAtom = atom({
-  key: "app/noticeSnackbarAtom",
-  default: {
-    opened: false,
-    autoHideDuration: 0,
-    severity: "",
-    msg: ""
-  }
-});
-
-function useNoticeSnackbarState() {
-  const [noticeSnackbar, setNoticeSnackbar] = useRecoilState(noticeSnackbarAtom);
-
-  const opened = noticeSnackbar.opened;
-  const autoHideDuration = noticeSnackbar.autoHideDuration;
-  const severity = noticeSnackbar.severity;
-  const msg = noticeSnackbar.msg;
-
-  const open = (msg, severity = "success", autoHideDuration = 6000) => {
-    setNoticeSnackbar({
-    opened: true,
-    autoHideDuration,
-    severity,
-    msg
-    });
-  }
-
-  const close = () => {
-    setNoticeSnackbar({...noticeSnackbar, opened: false});
-  }
-
-  return {
-    opened,
-    open,
-    close,
-    autoHideDuration,
-    severity,
-    msg
-  }
-}
 export default function App() {
+  const location = useLocation();
   
-
-
-  
-
   return (
     <> 
-      <AppBar position='fixed'>
-        <Toolbar>
-          <div className='flex-1'></div>
-          <div>TODO</div>
-          <div className='flex-1'></div>
-        </Toolbar>
-      </AppBar>
+    <span>현재 주소 : {location.pathname}</span>
 
-      <Toolbar/>
-      <NoticeSnackbar />
-      <NewTodoForm />
-      <TodoList />
+    <hr />
+
+{/* NavLink 링크를 달고 싶을때 씀 */}
+    <div>
+      <NavLink 
+      to="/home/main" 
+      // isActive 조건문을 달아서 클릭했을때 안했을때 상태 변환설정
+      className={({ isActive }) => classNames(
+        "btn", 
+        {"btn-link" : !isActive },
+        {"btn-primary" : isActive }
+      )}>
+        HOME, MAIN 페이지로 이동
+      </NavLink>
+
+      <NavLink 
+      to="/article/list" 
+      className={({ isActive }) => classNames(
+        "btn", 
+        {"btn-link" : !isActive },
+        {"btn-primary" : isActive }
+      )}>
+        ARTICLE, LIST 페이지로 이동
+      </NavLink>
+
+      <NavLink 
+      to="/user/login" 
+      className={({ isActive }) => classNames(
+        "btn", 
+        {"btn-link" : !isActive },
+        {"btn-primary" : isActive }
+      )}>
+        USER, LOGIN 페이지로 이동
+      </NavLink>
+    </div>
+      <Routes>
+        <Route path="/home/main" element={<HomeMainPage />} />
+        <Route path="/ARTICLE/LIST" element={<ArticleListPage />} />
+        <Route path="/ARTICLE/DETAIL" element={<ArticleDetailPage />} />
+        <Route path="/user/login" element={<UserLoginPage />} />
+        <Route path="*" element={<Navigate to="/user/login" />} />
+      </Routes>
     </>
-  );
-}
-
-
-
-function dateToStr(d) {
-  const pad = (n) => {
-    return n < 10 ? "0" + n : n;
-  }
-
-  return (
-    d.getFullYear() +
-    "-" +
-    pad(d.getMonth() + 1) +
-    "-" +
-    pad(d.getDate()) +
-    " " +
-    pad(d.getHours()) +
-    ":" +
-    pad(d.getMinutes()) +
-    ":" +
-    pad(d.getSeconds())
   );
 }
 

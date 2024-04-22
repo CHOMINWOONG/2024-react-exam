@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import {ThemeProvider, CssBaseline, createTheme} from "@mui/material";
 import App from './App';
 import { RecoilRoot } from 'recoil';
+import { HashRouter as Router } from "react-router-dom";
 
 const muiThemePaletteKeys = [
   "background",
@@ -51,7 +52,9 @@ export default function Root() {
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <RecoilRoot>
-              <App />
+              <Router>
+                <App />
+              </Router>
             </RecoilRoot>
             
           </ThemeProvider>

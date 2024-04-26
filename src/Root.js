@@ -55,8 +55,7 @@ export default function Root() {
               <Router>
                 <App />
               </Router>
-            </RecoilRoot>
-            
+            </RecoilRoot>           
           </ThemeProvider>
         );
         
